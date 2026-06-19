@@ -272,10 +272,45 @@ footer{background:var(--bg-primary);border-top:1px solid var(--border);padding:3
   .stats-grid{grid-template-columns:1fr 1fr}
   .footer-inner{grid-template-columns:1fr;text-align:center}.footer-socials{justify-content:center}
 }
+
+/* ── CURSOR ── */
+.cursor{position:fixed;width:20px;height:20px;border:2px solid var(--neon);border-radius:50%;pointer-events:none;z-index:99999;transition:transform .15s ease,opacity .3s;mix-blend-mode:difference}
+.cursor-dot{position:fixed;width:6px;height:6px;background:var(--neon);border-radius:50%;pointer-events:none;z-index:99999;transition:none}
+.cursor.expanded{transform:scale(2.5);opacity:.5}
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;background:#0a0a0a;z-index:99990;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transition:opacity .6s ease}
+#loader.done{opacity:0;pointer-events:none}
+.loader-logo{font-family:'Space Grotesk',sans-serif;font-size:3rem;font-weight:900;background:linear-gradient(135deg,#00e5ff,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:pulse-logo 1.5s ease-in-out infinite}
+@keyframes pulse-logo{0%,100%{opacity:.6}50%{opacity:1}}
+.loader-bar-wrap{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.loader-bar{height:100%;width:0%;background:linear-gradient(90deg,#00e5ff,#7c6fff);border-radius:2px;transition:width .05s linear}
+.loader-text{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text-muted);letter-spacing:.15em}
+/* ── CANVAS ── */
+#hero-canvas{position:absolute;inset:0;z-index:1;pointer-events:none}
+/* ── MAGNETIC WRAP ── */
+.magnetic{display:inline-flex}
+/* ── COUNTER ── */
+.stat-value[data-count]{transition:all .3s}
+/* ── ENHANCED CARDS ── */
+.project-card{position:relative}
+.project-card::after{content:'';position:absolute;inset:-1px;border-radius:21px;background:var(--gradient);opacity:0;transition:opacity .4s;z-index:-1;pointer-events:none}
+.project-card:hover::after{opacity:.5}
+/* ── GLOW CLICK ── */
+.click-burst{position:fixed;pointer-events:none;z-index:99998;border-radius:50%;width:0;height:0;transform:translate(-50%,-50%);animation:burstOut .5s ease forwards}
+@keyframes burstOut{0%{width:0;height:0;opacity:.8;background:radial-gradient(circle,rgba(0,229,255,.6),transparent)}100%{width:80px;height:80px;opacity:0;background:radial-gradient(circle,rgba(0,229,255,.1),transparent)}}
+/* ── EXPERIENCE BADGE ── */
+.exp-badge{display:inline-block;padding:.2rem .6rem;background:rgba(0,229,255,.1);color:var(--neon);border-radius:12px;font-size:.65rem;font-weight:700;border:1px solid rgba(0,229,255,.2);margin-left:.5rem;vertical-align:middle;font-family:'JetBrains Mono',monospace}
 </style>
 </head>
 <body>
 
+<div id="loader">
+  <div class="loader-logo">&lt;MTA/&gt;</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
+  <div class="loader-text" id="loader-text">Initialising AI systems...</div>
+</div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursor-dot"></div>
 <div id="scroll-progress"></div>
 <div class="animated-bg"><div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div></div>
 
@@ -323,7 +358,7 @@ footer{background:var(--bg-primary);border-top:1px solid var(--border);padding:3
 
 <!-- ══════════ HERO ══════════ -->
 <section id="home">
-  <div class="hero-bg">
+  <div class="hero-bg"><canvas id="hero-canvas"></canvas>
     <div class="hero-grid"></div>
     <div class="hero-glow"></div>
     <div class="hero-glow hero-glow-2"></div>
@@ -333,7 +368,7 @@ footer{background:var(--bg-primary);border-top:1px solid var(--border);padding:3
     <div class="hero-text">
       <div class="hero-badge reveal">
         <span class="badge-dot"></span>
-        Available for AI Engineer roles · June 2026
+        ⚡ AI Engineer at Techlape · Open to UAE / Remote
         <span class="hero-badge-arrow">→</span>
       </div>
 
@@ -402,7 +437,7 @@ footer{background:var(--bg-primary);border-top:1px solid var(--border);padding:3
       <h2 class="section-title">About Me</h2>
       <p class="section-subtitle">Get to know me better</p>
       <p class="about-intro">
-        I'm an <span class="neon-text">AI Engineer</span> and final-year CS student at COMSATS University Islamabad, building production-grade AI systems before finishing my degree. I specialise in <span class="neon-text">RAG pipelines</span>, <span class="neon-text">LLM agents</span>, and <span class="neon-text">full-stack AI products</span> — turning complex model architectures into systems that actually ship and scale.
+        I'm an <span class="neon-text">AI Engineer at Techlape</span> and final-year CS student at COMSATS University Islamabad, shipping production AI systems before finishing my degree. I specialise in <span class="neon-text">autonomous agents</span>, <span class="neon-text">RAG pipelines</span>, and <span class="neon-text">full-stack AI SaaS</span> — from a WhatsApp AI business agent handling 200+ daily interactions to a multi-tenant social media automation platform. I build things that actually work in the real world.
       </p>
     </div>
 
@@ -465,10 +500,10 @@ footer{background:var(--bg-primary);border-top:1px solid var(--border);padding:3
 
       <div class="reveal-right">
         <div class="stats-grid">
-          <div class="stat-card"><span class="stat-value">3+</span><span class="stat-label">Deployed Products</span></div>
-          <div class="stat-card"><span class="stat-value">10K+</span><span class="stat-label">Records Automated</span></div>
-          <div class="stat-card"><span class="stat-value">7</span><span class="stat-label">AI Features Built</span></div>
-          <div class="stat-card"><span class="stat-value">3.44</span><span class="stat-label">CGPA / 4.0</span></div>
+          <div class="stat-card"><span class="stat-value" data-count="3" data-suffix="+">0+</span><span class="stat-label">Deployed Products</span></div>
+          <div class="stat-card"><span class="stat-value" data-count="10" data-suffix="K+">0K+</span><span class="stat-label">Records Automated</span></div>
+          <div class="stat-card"><span class="stat-value" data-count="7" data-suffix="">0</span><span class="stat-label">AI Features Built</span></div>
+          <div class="stat-card"><span class="stat-value" data-count="344" data-suffix="" data-decimal="2">0.00</span><span class="stat-label">CGPA / 4.0</span></div>
         </div>
         <div class="about-quote">
           <p class="quote-text">"I find the gap between a model that works on paper and a system that works in the world — and I live there."</p>
@@ -522,6 +557,16 @@ footer{background:var(--bg-primary);border-top:1px solid var(--border);padding:3
 
     <div class="exp-grid reveal">
       <div class="exp-card">
+        <div class="exp-period">Apr 2026 – Present <span class="exp-badge">FULL-TIME</span></div>
+        <div class="exp-title">AI &amp; Automation Engineer</div>
+        <div class="exp-company">Techlape · Software House, Islamabad</div>
+        <ul class="exp-bullets">
+          <li>Architected and shipped ReplyMate: a production WhatsApp AI agent processing 200+ daily interactions using GPT-4o-mini function calling, Whisper STT, GPT-4o Vision, and a 9-step state-machine order workflow — live, serving paying clients</li>
+          <li>Built AutoPoster: a multi-tenant AI SaaS with Gemini 2.0 multimodal caption generation and APScheduler automation publishing 100+ posts/day to Instagram and Facebook for 3+ live business clients</li>
+          <li>Engineered production-grade systems with Fernet encryption, JWT/RBAC, idempotency guards, and 24-hour API health monitoring across all deployments</li>
+        </ul>
+      </div>
+      <div class="exp-card">
         <div class="exp-period">Jul 2025 – Sep 2025</div>
         <div class="exp-title">Artificial Intelligence Intern</div>
         <div class="exp-company">Eye4tech Pvt Ltd · AI product studio, Islamabad</div>
@@ -533,12 +578,22 @@ footer{background:var(--bg-primary);border-top:1px solid var(--border);padding:3
       </div>
       <div class="exp-card">
         <div class="exp-period">Aug 2024 – Sep 2024</div>
-        <div class="exp-title">Data Science Intern</div>
-        <div class="exp-company">INSAFDAR · Remote (Data analytics consultancy)</div>
+        <div class="exp-title">Data Science &amp; AI Intern</div>
+        <div class="exp-company">INSAFDAR · Remote</div>
         <ul class="exp-bullets">
-          <li>Trained and benchmarked logistic regression classifiers on a 15,000+ record dataset, achieving 87% accuracy with Scikit-learn</li>
-          <li>Engineered 12+ features via normalisation and encoding, reducing baseline model error by ~15%</li>
-          <li>Produced EDA dashboards surfacing 3 class-imbalance issues, boosting final F1-score by ~12%</li>
+          <li>Trained and benchmarked classifiers on a 15,000+ record real-world dataset achieving 87% accuracy with Scikit-learn</li>
+          <li>Engineered 12+ features via normalisation, encoding, and SMOTE oversampling, reducing baseline error by ~15%</li>
+          <li>Produced EDA dashboards (Matplotlib, Seaborn) surfacing 3 critical class-imbalance insights that directly guided model selection</li>
+        </ul>
+      </div>
+      <div class="exp-card">
+        <div class="exp-period">Aug 2024 – Sep 2024</div>
+        <div class="exp-title">AI &amp; Python Programming Intern</div>
+        <div class="exp-company">Code Alpha · Remote</div>
+        <ul class="exp-bullets">
+          <li>Built NLP chatbots with NLTK and spaCy covering intent classification and entity recognition for structured multi-turn dialogue</li>
+          <li>Implemented real-time object detection pipelines using YOLO and CNN architectures</li>
+          <li>Developed a multi-language translation tool integrating Google Translate API with pre-trained models</li>
         </ul>
       </div>
     </div>
@@ -664,6 +719,9 @@ const SKILLS = [
   {name:'Whisper STT',cat:'LLMs & RAG',level:'Advanced',color:'#7c6fff',bg:'rgba(124,111,255,.12)'},
   {name:'GPT-4 Vision',cat:'LLMs & RAG',level:'Advanced',color:'#ff7eb6',bg:'rgba(255,126,182,.1)'},
   {name:'OpenRouter',cat:'LLMs & RAG',level:'Advanced',color:'#00e5ff',bg:'rgba(0,229,255,.08)'},
+  {name:'Claude API',cat:'LLMs & RAG',level:'Advanced',color:'#cc785c',bg:'rgba(204,120,92,.12)'},
+  {name:'Gemini 2.0',cat:'LLMs & RAG',level:'Advanced',color:'#4285f4',bg:'rgba(66,133,244,.12)'},
+  {name:'WhatsApp API',cat:'Backend & Tools',level:'Expert',color:'#25d366',bg:'rgba(37,211,102,.12)'},
   {name:'Python',cat:'AI & ML',level:'Expert',color:'#4b8bbe',bg:'rgba(75,139,190,.12)'},
   {name:'TensorFlow',cat:'AI & ML',level:'Advanced',color:'#ff8c00',bg:'rgba(255,140,0,.12)'},
   {name:'Keras',cat:'AI & ML',level:'Advanced',color:'#d10000',bg:'rgba(209,0,0,.1)'},
@@ -692,31 +750,34 @@ const SKILLS = [
 
 const PROJECTS = [
   {
-    title:'Eductive',subtitle:'AI Teaching Assistant LMS · Final Year Project',
+    title:'EDUCTIVE',subtitle:'AI Teaching Assistant LMS · Final Year Project',
     bg:'linear-gradient(135deg,#0a0a1a 0%,#0d1b2a 50%,#00f5ff22 100%)',
     accent:'#00e5ff',
-    desc:'Full-stack LMS with 7 AI features — RAG chatbot, LLM auto-grader, and quiz generator. Teachers upload PDFs; students get source-cited answers. Auto-grades PDF/DOCX submissions with scores, feedback, and missing concepts.',
+    desc:'Full-stack LMS with 7 AI features — RAG chatbot, LLM auto-grader, AI quiz generator, concept gap detection, and performance analytics. Teachers upload PDFs; students get source-cited answers. Auto-grades PDF/DOCX submissions with scores, feedback, and missing concepts.',
     impact:'~70% grading automated · ~60% study lookup reduction · 200+ concurrent users',
     tech:['Python','Flask','GPT-4o-mini','LangChain','Pinecone','PostgreSQL','RAG','SQLAlchemy'],
-    github:'https://github.com/Tayyaab-Ansari/eductive',live:''
+    github:'https://github.com/Tayyaab-Ansari/eductive',
+    linkedin:'https://www.linkedin.com/posts/muhammad-tayyaab-ansari_finalyearproject-ai-machinelearning-ugcPost-7467147776204881920-QCQa/'
   },
   {
-    title:'AutoPoster',subtitle:'Multi-Tenant Social Media SaaS',
+    title:'AutoPoster',subtitle:'Multi-Tenant AI Social Media SaaS · Production',
     bg:'linear-gradient(135deg,#0a0a1a 0%,#0d1a0d 50%,#22c55e11 100%)',
     accent:'#22c55e',
-    desc:'Production SaaS for Instagram and Facebook scheduling via Meta Graph API. AI caption generation with Gemini 2.0 Flash multimodal, Fernet-encrypted token storage, 3-tier RBAC, and APScheduler with file-lock concurrency for 100+ posts/day.',
-    impact:'~75% content creation time saved · 100+ posts/day · 3+ business clients · zero duplicates',
+    desc:'Production SaaS for Instagram and Facebook scheduling via Meta Graph API. AI caption generation with Gemini 2.0 Flash multimodal (image-aware), Fernet-encrypted token storage, 3-tier RBAC with JWT, and APScheduler with FileLock concurrency for 100+ posts/day across 3+ live business clients.',
+    impact:'~75% content creation time saved · 100+ posts/day · 3+ live clients · zero duplicates',
     tech:['Flask','PostgreSQL','Meta Graph API','Gemini 2.0','APScheduler','JWT','Cloudinary'],
-    github:'https://github.com/Tayyaab-Ansari/autoposter',live:''
+    github:null,
+    linkedin:'https://www.linkedin.com/posts/muhammad-tayyaab-ansari_saas-socialmediamanagement-aiautomation-ugcPost-7473362049616654337-yXuV/'
   },
   {
-    title:'WhatsApp AI Agent',subtitle:'Conversational AI Business Assistant',
+    title:'WhatsApp AI Agent',subtitle:'Autonomous AI Business Assistant · Production',
     bg:'linear-gradient(135deg,#0a0a1a 0%,#1a0d2a 50%,#7c3aed22 100%)',
     accent:'#7c6fff',
-    desc:'Production AI agent on WhatsApp — LLM function-calling for menus and FAQs, Whisper STT for voice notes, GPT-4 Vision for image orders, end-to-end order placement, and a human-handoff module with auto-resume after 2 hours.',
-    impact:'~200 daily messages · <3s response latency · 500+ test transactions · full Supabase logging',
-    tech:['GPT-4o-mini','Whisper','GPT-4 Vision','Supabase','WhatsApp API','Flask','Function Calling'],
-    github:'https://github.com/Tayyaab-Ansari/whatsapp-agent',live:''
+    desc:'Production autonomous AI agent on WhatsApp — GPT-4o-mini function calling with runtime tool injection, Whisper STT for voice notes, GPT-4o Vision for image orders, 9-step order state machine, human-handoff with 2-hour auto-resume, and multilingual support across 6 languages.',
+    impact:'200+ daily interactions · sub-3s latency SLA · live clients · 6 languages supported',
+    tech:['GPT-4o-mini','Whisper','GPT-4 Vision','PostgreSQL','WhatsApp API','Flask','Function Calling'],
+    github:null,
+    linkedin:'https://www.linkedin.com/posts/muhammad-tayyaab-ansari_are-you-tired-of-losing-customers-because-ugcPost-7370744626196017152-KCIN/'
   },
 ];
 
@@ -752,12 +813,19 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 renderSkills('All');
 
 // ── PROJECTS RENDER ───────────────────────────────────────────────────────
+const LI_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>`;
+const GH_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>`;
 const grid = document.getElementById('projects-grid');
 PROJECTS.forEach(p => {
   const card = document.createElement('div');
   card.className = 'project-card reveal';
   const techHTML = p.tech.map(t => `<span class="tag">${t}</span>`).join('');
-  const ghBtn = p.github ? `<a href="${p.github}" target="_blank" class="btn btn-outline project-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>GitHub</a>` : '';
+  const ghBtn = p.github ? `<a href="${p.github}" target="_blank" class="btn btn-outline project-btn">${GH_SVG}GitHub</a>` : '';
+  const liBtn = p.linkedin ? `<a href="${p.linkedin}" target="_blank" class="btn btn-primary project-btn">${LI_SVG}LinkedIn</a>` : '';
+  const overlayLinks = [
+    p.github ? `<a href="${p.github}" target="_blank" class="project-link-btn">${GH_SVG}GitHub</a>` : '',
+    p.linkedin ? `<a href="${p.linkedin}" target="_blank" class="project-link-btn">${LI_SVG}View Demo</a>` : ''
+  ].join('');
   card.innerHTML = `
     <div class="project-image">
       <div class="project-placeholder" style="background:${p.bg}">
@@ -767,9 +835,7 @@ PROJECTS.forEach(p => {
         <span class="placeholder-title">${p.title}</span>
       </div>
       <div class="project-overlay">
-        <div class="project-links-overlay">
-          ${p.github ? `<a href="${p.github}" target="_blank" class="project-link-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>GitHub</a>` : ''}
-        </div>
+        <div class="project-links-overlay">${overlayLinks}</div>
       </div>
     </div>
     <div class="project-body">
@@ -780,14 +846,14 @@ PROJECTS.forEach(p => {
         <div class="project-impact">${p.impact}</div>
         <div class="project-tech">${techHTML}</div>
       </div>
-      <div class="project-actions">${ghBtn}</div>
+      <div class="project-actions">${ghBtn}${liBtn}</div>
     </div>
   `;
   grid.appendChild(card);
 });
 
 // ── TYPING ANIMATION ─────────────────────────────────────────────────────
-const TYPED_STRINGS = ['AI Engineer','ML Engineer','RAG Specialist','LLM Systems Builder','Data Scientist'];
+const TYPED_STRINGS = ['AI Engineer','Automation Engineer','RAG Specialist','LLM Agent Builder','Data Scientist','n8n Developer'];
 let ti = 0, ci = 0, deleting = false;
 const typedEl = document.getElementById('typed');
 function type() {
@@ -880,6 +946,133 @@ document.getElementById('contact-form').addEventListener('submit', e => {
   e.target.reset();
   const mailto = `mailto:tayyaab36@gmail.com?subject=Portfolio Contact&body=${encodeURIComponent(e.target.message.value)}`;
   window.open(mailto);
+});
+
+// ── LOADER ────────────────────────────────────────────────────────────────
+const loaderMsgs = ['Initialising AI systems...','Loading neural networks...','Compiling LLM agents...','Calibrating RAG pipelines...','Ready.'];
+let lp = 0;
+const lbar = document.getElementById('loader-bar');
+const ltxt = document.getElementById('loader-text');
+const loaderEl = document.getElementById('loader');
+const lInterval = setInterval(() => {
+  lp += 2;
+  lbar.style.width = lp + '%';
+  if (lp % 20 === 0) ltxt.textContent = loaderMsgs[Math.floor(lp/20) - 1] || 'Ready.';
+  if (lp >= 100) { clearInterval(lInterval); setTimeout(() => loaderEl.classList.add('done'), 300); }
+}, 25);
+
+// ── CURSOR ────────────────────────────────────────────────────────────────
+const cur = document.getElementById('cursor');
+const curDot = document.getElementById('cursor-dot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; curDot.style.left=mx-3+'px'; curDot.style.top=my-3+'px'; });
+(function animCursor() {
+  cx+=(mx-cx)*.15; cy+=(my-cy)*.15;
+  cur.style.left=cx-10+'px'; cur.style.top=cy-10+'px';
+  requestAnimationFrame(animCursor);
+})();
+document.querySelectorAll('a,button,.project-card,.skill-card,.stat-card').forEach(el => {
+  el.addEventListener('mouseenter',()=>cur.classList.add('expanded'));
+  el.addEventListener('mouseleave',()=>cur.classList.remove('expanded'));
+});
+
+// ── CLICK BURST ───────────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const b = document.createElement('div');
+  b.className = 'click-burst';
+  b.style.left = e.clientX+'px'; b.style.top = e.clientY+'px';
+  document.body.appendChild(b);
+  setTimeout(()=>b.remove(), 500);
+});
+
+// ── THREE.JS PARTICLE NETWORK ────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  if (!canvas) return;
+  const gl = canvas.getContext('2d');
+  let W, H, particles = [];
+  function resize() {
+    const hero = document.getElementById('home');
+    W = canvas.width = hero.offsetWidth;
+    H = canvas.height = hero.offsetHeight;
+  }
+  resize(); window.addEventListener('resize', () => { resize(); initParticles(); });
+  function Particle() {
+    this.x = Math.random()*W; this.y = Math.random()*H;
+    this.vx = (Math.random()-.5)*.4; this.vy = (Math.random()-.5)*.4;
+    this.r = Math.random()*2+1;
+  }
+  function initParticles() {
+    particles = [];
+    const n = Math.floor(W*H/10000);
+    for(let i=0;i<Math.min(n,80);i++) particles.push(new Particle());
+  }
+  initParticles();
+  const isDarkFn = () => document.documentElement.getAttribute('data-theme') !== 'light';
+  function draw() {
+    gl.clearRect(0,0,W,H);
+    const col = isDarkFn() ? '0,229,255' : '8,145,178';
+    particles.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+      gl.beginPath(); gl.arc(p.x,p.y,p.r,0,Math.PI*2);
+      gl.fillStyle=`rgba(${col},.6)`; gl.fill();
+    });
+    particles.forEach((a,i) => {
+      for(let j=i+1;j<particles.length;j++) {
+        const b=particles[j];
+        const d=Math.hypot(a.x-b.x,a.y-b.y);
+        if(d<120) {
+          gl.beginPath(); gl.moveTo(a.x,a.y); gl.lineTo(b.x,b.y);
+          gl.strokeStyle=`rgba(${col},${(1-d/120)*.25})`; gl.lineWidth=.8; gl.stroke();
+        }
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── COUNTER ANIMATION ─────────────────────────────────────────────────────
+function animateCounter(el) {
+  const target = parseFloat(el.dataset.count);
+  const suffix = el.dataset.suffix || '';
+  const isDecimal = el.dataset.decimal;
+  const duration = 1800;
+  const start = performance.now();
+  function step(now) {
+    const t = Math.min((now-start)/duration, 1);
+    const ease = 1-Math.pow(1-t,3);
+    const val = target * ease;
+    if (isDecimal) {
+      el.textContent = (val/100).toFixed(2) + suffix;
+    } else {
+      el.textContent = Math.round(val) + suffix;
+    }
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.target.dataset.count) {
+      animateCounter(e.target);
+      counterObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-value[data-count]').forEach(el => counterObs.observe(el));
+
+// ── MAGNETIC BUTTONS ──────────────────────────────────────────────────────
+document.querySelectorAll('.btn,.btn-ghost').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const r = btn.getBoundingClientRect();
+    const x = (e.clientX - r.left - r.width/2) * .25;
+    const y = (e.clientY - r.top - r.height/2) * .25;
+    btn.style.transform = `translate(${x}px,${y}px) translateY(-2px)`;
+  });
+  btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
 });
 </script>
 </body>
